@@ -53,6 +53,7 @@ in
     terminal = "tmux-256color";
     extraConfig = ''
       set-option -g renumber-windows on
+      set-option -g status-style fg=yellow,bg=default
     '';
   };
 
