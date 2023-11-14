@@ -2,6 +2,7 @@
 
 {
   nix.gc.automatic = true;
+  nix.gc.interval = { Hour = 12; };
   nix.settings.experimental-features = "nix-command flakes";
   nixpkgs.config.allowUnfree = true;
 

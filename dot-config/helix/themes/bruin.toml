@@ -26,11 +26,8 @@
 "constant.character.escape" = { fg = "light-red", modifiers = ["bold"] }
 "function" = { modifiers = ["bold"] }
 "function.builtin" = { modifiers = ["bold"] }
-"keyword" = { modifiers = ["italic", "bold"] }
 "label" = { modifiers = ["underlined"] }
 "string" = { fg = "light-green", modifiers = ["dim"] }
-"variable" = { modifiers = ["dim"] }
-"variable.builtin" = { modifiers = ["italic"] }
 "variable.other.member" = {}
 "variable.parameter" = { modifiers = ["underlined"] }
 
