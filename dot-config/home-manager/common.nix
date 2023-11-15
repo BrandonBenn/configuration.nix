@@ -30,8 +30,14 @@ in
       pull.rebase = true;
       fetch.prune = true;
       push.default = "current";
-      alias.wip = "!git add -A && git commit -m 'WIP'";
-      alias.lazy = ''!git add -A && git commit -m "$(git diff --name-status)"'';
+      log.abbrevCommit = true;
+      format.pretty = "oneline";
+      alias = {
+        wip = "!git add -A && git commit -m 'WIP'";
+        lazy = ''!git add -A && git commit -m "$(git diff --name-status)"'';
+        undo = "!git reset HEAD~1 --mixed";
+        sync = "!f() { git fetch --tags && git pull && git push; };f";
+      };
     };
   };
 
