@@ -1,0 +1,6 @@
+[[language]]
+name = "ruby"
+formatter = { command = "rubocop", args = ["--stdin", "%", "-a", "--stderr", "--fail-level", "fatal"] }
+
+[language-server.solargraph.config.solargraph]
+diagnostics = true

@@ -1,6 +1,8 @@
 default:
 	just --list
 
+alias c := commit
+
 commit:
 	#!/bin/sh
 	# Add all changes to staging area
