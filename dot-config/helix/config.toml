@@ -6,6 +6,7 @@ line-number = "relative"
 completion-trigger-len = 3
 mouse = false
 true-color = true
+scrolloff = 999
 
 [keys.normal]
 esc = ["collapse_selection", "keep_primary_selection"]
