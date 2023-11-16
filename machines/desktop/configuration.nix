@@ -11,7 +11,20 @@
     ];
 
   nix.package = pkgs.nixFlakes;
-  nix.extraOptions = "experimental-features = nix-command flakes";
+  nix.gc.automatic = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  system.autoUpgrade = {
+    enable = true;
+    flake = inputs.self.outPath;
+    flags = [
+      "--update-input"
+      "nixpkgs"
+      "-L" # print build logs
+    ];
+    dates = "02:00";
+    randomizedDelaySec = "45min";
+  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -19,7 +32,6 @@
   boot.initrd.systemd.enable = true;
   boot.plymouth.enable = true;
   boot.kernelParams = [ "quiet" ];
-
   boot.initrd.luks.devices."luks-28fbb4da-6727-4876-ae9b-c122088c24b5".device = "/dev/disk/by-uuid/28fbb4da-6727-4876-ae9b-c122088c24b5";
   networking.hostName = "desktop"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -47,10 +59,6 @@
     LC_TELEPHONE = "zh_TW.UTF-8";
     LC_TIME = "zh_TW.UTF-8";
   };
-
-
-  nix.gc.automatic = true;
-  nix.settings.experimental-features = [ "nix-command" ];
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
