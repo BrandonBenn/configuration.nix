@@ -84,6 +84,8 @@ in
       rm = ''${pkgs.trash-cli}/bin/trash'';
       tree = ''${pkgs.eza}/bin/eza --tree'';
       T = ''tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$HOSTNAME'';
+      e = "$EDITOR";
+      g = "git";
     };
   };
 
