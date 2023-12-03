@@ -72,6 +72,11 @@ in
     };
   };
 
+  programs.password-store = {
+    enable = true;
+    package = pkgs.pass.withExtensions (exts: [ exts.pass-genphrase exts.pass-otp ]);
+  };
+
   programs.helix = {
     enable = true;
     defaultEditor = true;
