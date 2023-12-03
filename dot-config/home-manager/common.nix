@@ -14,6 +14,14 @@ in
     CXX = ''${pkgs.zig}/bin/zig c++'';
   };
 
+  home.shellAliases = {
+    e = "$EDITOR";
+    g = "git";
+    rm = ''${pkgs.trash-cli}/bin/trash'';
+    T = ''tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$HOSTNAME'';
+    tree = ''${pkgs.eza}/bin/eza --tree'';
+  };
+
   programs.gpg.enable = true;
   programs.lazygit.enable = true;
   programs.ripgrep.enable = true;
@@ -80,6 +88,8 @@ in
     keyMode = "vi";
     prefix = "C-a";
     sensibleOnTop = true;
+    newSession = true;
+    escapeTime = 0;
     terminal = "tmux-256color";
     extraConfig = ''
       set-option -g renumber-windows on
@@ -104,13 +114,6 @@ in
     enableCompletion = true;
     enableVteIntegration = true;
     defaultKeymap = "emacs";
-    shellAliases = {
-      rm = ''${pkgs.trash-cli}/bin/trash'';
-      tree = ''${pkgs.eza}/bin/eza --tree'';
-      T = ''tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$HOSTNAME'';
-      e = "$EDITOR";
-      g = "git";
-    };
   };
 
   programs.starship = {
@@ -126,11 +129,6 @@ in
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
-  };
-
-  programs.password-store = {
-    enable = true;
-    package = pkgs.pass.withExtensions (exts: [ exts.pass-genphrase exts.pass-otp ]);
   };
 
   programs.firefox = {
@@ -161,6 +159,7 @@ in
     };
     profiles.brandon.isDefault = true;
     profiles.brandon.extensions = with nurpkgs.repos.rycee.firefox-addons; [
+      bitwarden
       temporary-containers
       tridactyl
       ublock-origin

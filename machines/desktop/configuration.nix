@@ -16,7 +16,6 @@
 
   system.autoUpgrade = {
     enable = true;
-    flake = inputs.self.outPath;
     flags = [
       "--update-input"
       "nixpkgs"
@@ -39,7 +38,7 @@
   # Enable networking
   networking.networkmanager.enable = true;
   networking.extraHosts = let
-    hostsFile = builtins.fetchurl https://hblock.molinero.dev/hosts;
+    hostsFile = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
   in builtins.readFile "${hostsFile}";
 
   # Set your time zone.
@@ -93,19 +92,12 @@
       settings = {
         main = {
           capslock = "overload(control, esc)";
-          rightalt = "layer(rightalt)";
           fn = "layer(fn)";
         };
-        rightalt = {
-          h = "left";
-          j = "down";
-          k = "up";
-          l = "right";
-        };
         fn = {
-          "=" = "volumeup";
-          "-" = "volumedown";
-          "0" = "mute";
+          "equal" = "volumeup";
+          "minus" = "volumedown";
+          "0"     = "mute";
         };
       };
     };
@@ -259,6 +251,5 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
-
+  system.stateVersion = "23.11"; # Did you read the comment?
 }

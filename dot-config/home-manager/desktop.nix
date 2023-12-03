@@ -2,8 +2,11 @@
 
 {
   imports = [ ./common.nix ];
-  home.username = "brandon";
-  home.homeDirectory = "/home/brandon";
-  home.stateVersion = "23.05";
+  home = {
+    username = "brandon";
+    homeDirectory = "/home/brandon";
+    stateVersion = "23.05";
+    enableNixpkgsReleaseCheck = false;
+  };
   programs.home-manager.enable = true;
 }
