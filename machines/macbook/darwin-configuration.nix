@@ -23,7 +23,7 @@
     ];
     in builtins.concatStringsSep "\n" hosts;
 
-  environment.shellInit = ''
+  environment.interactiveShellInit = ''
     eval $(/opt/homebrew/bin/brew shellenv)
   '';
   
@@ -31,6 +31,8 @@
     enable = true;
     enableCompletion = false;
   };
+
+  programs.gnupg.agent.enable = true;
 
   homebrew = {
     enable = true;
@@ -43,8 +45,11 @@
     ];
     taps = [];
     casks = [
-      "yattee"
+      "logseq"
       "maccy"
+      "firefox"
+      "dmenu-mac"
+      "google-chrome"
     ];
   };
 
@@ -62,9 +67,10 @@
       AppleEnableMouseSwipeNavigateWithScrolls = false;
       # Allow full-OS keyboard control.
       AppleKeyboardUIMode = 3;
+      _HIHideMenuBar = true;
 
       # Disable press-and-hold for keys in favor of key repeat.
-      ApplePressAndHoldEnabled = true;
+      ApplePressAndHoldEnabled = false;
 
       # Always show file extensions in Finder.
       AppleShowAllExtensions = true;
@@ -91,7 +97,7 @@
     # More than just the dock configruation; also controls hot corners.
     dock = {
       autohide = true;
-      autohide-delay = 0.1;
+      autohide-delay = 0.0;
       launchanim = false;
       mru-spaces = false;
       # Put the dock on the left side of the screen, where we won't have to see it.
@@ -116,10 +122,48 @@
       # Show the pathbar, which gives us breadcrumbs to the current folder.
       ShowPathbar = true;
       # Show the status bar, which has some useful metadata.
-      ShowStatusBar = true;
+      ShowStatusBar = false;
       # Use the POSIX path in the finder title, rather than just the folder name.
       _FXShowPosixPathInTitle = true;
     };
     loginwindow.GuestEnabled = false;
+  };
+
+  services.yabai = {
+    enable = true;
+    config = {
+      layout              = "float";
+      top_padding         = 0;
+      bottom_padding      = 0;
+      left_padding        = 0;
+      right_padding       = 0;
+      window_gap          = 0;
+      mouse_modifier      = "fn";
+    };
+  };
+
+  services.skhd = {
+    enable = true;
+    skhdConfig = ''
+      fn - h : ${pkgs.skhd}/bin/skhd -k "left"
+      fn - j : ${pkgs.skhd}/bin/skhd -k "down"
+      fn - k : ${pkgs.skhd}/bin/skhd -k "up"
+      fn - l : ${pkgs.skhd}/bin/skhd -k "right"
+
+      cmd + alt - f : open /Applications/Alacritty.app
+      cmd + alt - d : open /Applications/Google\ Chrome.app
+      cmd + alt - s : open /Applications/Slack.app
+      cmd + alt - a : export MOZ_DISABLE_SAFE_MODE_KEY=1; open /Applications/Firefox.app
+      cmd - space   : open -n /Applications/dmenu-mac.app
+
+      # Window Position
+      shift + alt - up    : yabai -m window --grid 1:1:0:0:1:1 # fill
+      shift + alt - left  : yabai -m window --grid 1:2:0:0:1:1 # left
+      shift + alt - right : yabai -m window --grid 1:2:1:0:1:1 # right
+      shift + alt - down  : yabai -m window --grid 4:4:1:1:2:2 # center
+
+      # cycle through all visible windows sorted by: coordinates -> display index
+      alt - tab : yabai -m window --focus "$(yabai -m query --windows --space | ${pkgs.jq}/bin/jq -re "[sort_by(.id, .frame) | reverse | .[] | select(.role == \"AXWindow\" and .subrole == \"AXStandardWindow\") | .id] | nth(index($(yabai -m query --windows --window | ${pkgs.jq}/bin/jq -re ".id")) - 1)")"
+      '';
   };
 }

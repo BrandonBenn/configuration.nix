@@ -1,6 +1,6 @@
 "ui.background" = { bg = "none" }
-"ui.bufferline.active" = { fg = "black", bg = "none" }
-"ui.bufferline" = { fg = "black", bg = "none" }
+"ui.bufferline.active" = { modifiers = ["reversed"] }
+"ui.bufferline" = { bg = "none" }
 "ui.cursor" = { bg = "#E03FD8" }
 "ui.cursorline" = { bg = "light-gray" }
 "ui.cursor.match" = { bg="none" }
