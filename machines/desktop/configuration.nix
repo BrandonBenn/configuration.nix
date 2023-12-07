@@ -5,58 +5,61 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
+  imports = [
       ./hardware-configuration.nix
-    ];
+  ];
 
   nix.package = pkgs.nixFlakes;
   nix.gc.automatic = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nixpkgs.config.allowUnfree = true;
 
   system.autoUpgrade = {
     enable = true;
-    flags = [
-      "--update-input"
-      "nixpkgs"
-      "-L" # print build logs
-    ];
+    flags = [ "--update-input" "nixpkgs" "-L" ];
     dates = "02:00";
     randomizedDelaySec = "45min";
   };
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.systemd.enable = true;
-  boot.plymouth.enable = true;
-  boot.kernelParams = [ "quiet" ];
-  boot.initrd.luks.devices."luks-28fbb4da-6727-4876-ae9b-c122088c24b5".device = "/dev/disk/by-uuid/28fbb4da-6727-4876-ae9b-c122088c24b5";
-  networking.hostName = "desktop"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    initrd.systemd.enable = true;
+    plymouth.enable = true;
+    kernelParams = [ "quiet" ];
+    initrd.luks.devices."luks-28fbb4da-6727-4876-ae9b-c122088c24b5".device = "/dev/disk/by-uuid/28fbb4da-6727-4876-ae9b-c122088c24b5";
+  };
 
-  # Enable networking
-  networking.networkmanager.enable = true;
-  networking.extraHosts = let
-    hostsFile = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-  in builtins.readFile "${hostsFile}";
+  networking = {
+    hostName = "desktop"; # Define your hostname.
+    networkmanager.enable = true;
+    extraHosts = let
+      hostsFile = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
+    in builtins.readFile "${hostsFile}";
+  };
 
-  # Set your time zone.
   time.timeZone = "Asia/Taipei";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "zh_TW.UTF-8";
-    LC_IDENTIFICATION = "zh_TW.UTF-8";
-    LC_MEASUREMENT = "zh_TW.UTF-8";
-    LC_MONETARY = "zh_TW.UTF-8";
-    LC_NAME = "zh_TW.UTF-8";
-    LC_NUMERIC = "zh_TW.UTF-8";
-    LC_PAPER = "zh_TW.UTF-8";
-    LC_TELEPHONE = "zh_TW.UTF-8";
-    LC_TIME = "zh_TW.UTF-8";
+  i18n = {
+    # Select internationalisation properties.
+    defaultLocale = "en_US.UTF-8";
+    extraLocaleSettings = {
+      LC_ADDRESS = "zh_TW.UTF-8";
+      LC_IDENTIFICATION = "zh_TW.UTF-8";
+      LC_MEASUREMENT = "zh_TW.UTF-8";
+      LC_MONETARY = "zh_TW.UTF-8";
+      LC_NAME = "zh_TW.UTF-8";
+      LC_NUMERIC = "zh_TW.UTF-8";
+      LC_PAPER = "zh_TW.UTF-8";
+      LC_TELEPHONE = "zh_TW.UTF-8";
+      LC_TIME = "zh_TW.UTF-8";
+    };
+    inputMethod = {
+       enabled = "fcitx5";
+       fcitx5.addons = with pkgs; [
+          fcitx5-gtk
+          fcitx5-chewing
+       ];
+    };
   };
 
   # Enable the X11 windowing system.
@@ -70,9 +73,17 @@
   #  Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+
+  # Automatic login
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "brandon";
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
+
   services.gnome.core-utilities.enable = false;
   services.gnome.tracker-miners.enable = false;
   services.gnome.tracker.enable = false;
+  services.gnome.sushi.enable = true;
   environment.gnome.excludePackages = [ pkgs.gnome-tour ];
 
   # Configure keymap in X11
@@ -85,19 +96,21 @@
   services.printing.enable = false;
 
   # Keyboard
-  services.keyd.enable = true;
-  services.keyd.keyboards = {
-    default = {
-      ids = ["*"];
-      settings = {
-        main = {
-          capslock = "overload(control, esc)";
-          fn = "layer(fn)";
-        };
-        fn = {
-          "equal" = "volumeup";
-          "minus" = "volumedown";
-          "0"     = "mute";
+  services.keyd = {
+    enable = true;
+    keyboards = {
+      default = {
+        ids = ["*"];
+        settings = {
+          main = {
+            capslock = "overload(control, esc)";
+            fn = "layer(fn)";
+          };
+          fn = {
+            "equal" = "volumeup";
+            "minus" = "volumedown";
+            "0"     = "mute";
+          };
         };
       };
     };
@@ -112,16 +125,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   services.flatpak.enable = true;
 
@@ -133,22 +137,25 @@
     packages = with pkgs; [
       thunderbird
       celluloid
+      lazygit
+      lf
     ];
   };
 
   environment.variables.EDITOR = "${pkgs.helix}/bin/hx";
 
-  programs.gnupg.agent = {
-    enable = true;
-    pinentryFlavor = "gnome3";
-  };
-
   users.defaultUserShell = pkgs.zsh;
-  programs.git.enable = true;
-  programs.firefox.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  programs = {
+    git.enable = true;
+    firefox.enable = true;
+    starship.enable = true;
+
+    zsh.enable = true;
+    zsh.autosuggestions.enable = true;
+    zsh.enableCompletion = true;
+    zsh.syntaxHighlighting.enable = true;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -158,19 +165,17 @@
     helix
     htop
     keyd
-    lazygit
-    lf
     ripgrep
-    rtx
     wget
     wl-clipboard
 
     gnome-console
     gnome.nautilus
-    gnome.sushi
     gnome.gnome-tweaks
     gnomeExtensions.appindicator
+    gnomeExtensions.clipboard-indicator
     gnomeExtensions.just-perfection
+    gnomeExtensions.run-or-raise
   ];
 
   fonts = {
@@ -192,21 +197,6 @@
     };
   };
 
-  programs.starship.enable = true;
-
-  programs.zsh.enable = true;
-  programs.zsh.autosuggestions.enable = true;
-  programs.zsh.enableCompletion = true;
-  programs.zsh.syntaxHighlighting.enable = true;
-
-  i18n.inputMethod = {
-     enabled = "fcitx5";
-     fcitx5.addons = with pkgs; [
-        fcitx5-gtk
-        fcitx5-chewing
-     ];
-  };
-
   # Allow flatpak to access system fonts and icons
   system.fsPackages = [ pkgs.bindfs ];
   fileSystems = let
@@ -225,25 +215,6 @@
     "/usr/share/icons" = mkRoSymBind (config.system.path + "/share/icons");
     "/usr/share/fonts" = mkRoSymBind (aggregatedFonts + "/share/fonts");
    };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
