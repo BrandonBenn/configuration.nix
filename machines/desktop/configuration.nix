@@ -2,17 +2,27 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
-
+{ config, lib, inputs, nixpkgs, home-manager, nur, hosts, ... }:
+let
+  system = "x86_64-linux";
+  lib = nixpkgs.lib;
+  pkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+  };
+in
 {
-  imports = [
-      ./hardware-configuration.nix
-  ];
+  imports = [ ./hardware-configuration.nix ];
 
   nix.package = pkgs.nixFlakes;
-  nix.gc.automatic = true;
+  nix.gc = {
+    dates = "weekly";
+    automatic = true;
+    options = "--delete-older-than 1w";
+  };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nixpkgs.config.allowUnfree = true;
+  nix.settings.auto-optimise-store = true;
+  nixpkgs.config.allowUnfree = lib.mkForce true;
 
   system.autoUpgrade = {
     enable = true;
@@ -24,6 +34,7 @@
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
+    loader.systemd-boot.configurationLimit = 10;
     initrd.systemd.enable = true;
     plymouth.enable = true;
     kernelParams = [ "quiet" ];
@@ -31,11 +42,8 @@
   };
 
   networking = {
-    hostName = "desktop"; # Define your hostname.
+    hostName = "desktop";
     networkmanager.enable = true;
-    extraHosts = let
-      hostsFile = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-    in builtins.readFile "${hostsFile}";
   };
 
   time.timeZone = "Asia/Taipei";
@@ -141,10 +149,9 @@
       lf
     ];
   };
+  users.defaultUserShell = pkgs.zsh;
 
   environment.variables.EDITOR = "${pkgs.helix}/bin/hx";
-
-  users.defaultUserShell = pkgs.zsh;
 
   programs = {
     git.enable = true;
