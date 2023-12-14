@@ -1,7 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nur.url = "github:nix-community/NUR";
     hosts.url = "github:StevenBlack/hosts";
 
     darwin = {
@@ -15,13 +14,13 @@
     };
   };
 
-  outputs = inputs @ { self, nixpkgs, darwin, home-manager, nur, hosts, ... }:
+  outputs = inputs @ { self, nixpkgs, darwin, home-manager, hosts, ... }:
   {
 
     nixosConfigurations = (
       import ./machines/desktop {
         inherit (nixpkgs) lib;
-        inherit inputs nixpkgs home-manager nur hosts;
+        inherit inputs nixpkgs home-manager hosts;
       }
     );
   
