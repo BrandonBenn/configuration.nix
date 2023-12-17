@@ -1,8 +1,8 @@
 { config, pkgs, ... }:
 {
   imports = [
-    ../../home/shell.nix
     ../../home/git.nix
+    ../../home/shell.nix
     ../../home/firefox.nix
   ];
 

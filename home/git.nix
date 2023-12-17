@@ -15,6 +15,7 @@
       log.abbrevCommit = true;
       format.pretty = "oneline";
       alias = {
+        st = "1git status";
         wip = "!git add -A && git commit -m 'WIP'";
         lazy = ''!git add -A && git commit -m "$(git diff --name-status)"'';
         undo = "!git reset HEAD~1 --mixed";

@@ -174,6 +174,7 @@ in
     keyd
     ripgrep
     wget
+    just
     wl-clipboard
 
     gnome-console

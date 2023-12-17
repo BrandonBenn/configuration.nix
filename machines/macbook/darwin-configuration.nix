@@ -1,26 +1,34 @@
 { config, pkgs, ... }:
 
+let
+  additionalHosts = [
+    "127.0.0.1   dev.services.faria.org"
+    "127.0.0.1   local-community.faria.org"
+    "127.0.0.1   local-certification.faria.org"
+  ];
+in
+
 {
-  nix.gc.automatic = true;
-  nix.gc.interval = { Hour = 12; };
-  nix.settings.experimental-features = "nix-command flakes";
+  # Auto upgrade nix package and the daemon service.
+  services.nix-daemon.enable = true;
+
+  nix = {
+    gc.automatic = true;
+    gc.interval = { Hour = 12; };
+    settings.experimental-features = "nix-command flakes";
+  };
+
   nixpkgs.config.allowUnfree = true;
 
   networking.hostName = "macbook";
   environment.systemPackages = with pkgs; [
    ngrok
-   gnupg
   ];
 
   environment.etc.hosts.text = let
     blockedHosts = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
     blockedHostsFile = builtins.readFile blockedHosts;
-    hosts = [
-     "127.0.0.1   dev.services.faria.org"
-     "127.0.0.1   local-community.faria.org"
-     "127.0.0.1   local-certification.faria.org"
-     blockedHostsFile
-    ];
+    hosts = additionalHosts ++ [blockedHostsFile];
     in builtins.concatStringsSep "\n" hosts;
 
   environment.interactiveShellInit = ''
@@ -32,10 +40,9 @@
     enableCompletion = false;
   };
 
-  programs.gnupg.agent.enable = true;
-
   homebrew = {
     enable = true;
+    autoUpdate = true;
     brews = [
       "coreutils"
       { name = "libyaml"; link = true; }
@@ -43,7 +50,6 @@
       { name = "redis"; restart_service = true; }
       { name = "opensearch"; restart_service = true; }
     ];
-    taps = [];
     casks = [
       "logseq"
       "maccy"
@@ -55,12 +61,9 @@
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
-  system.stateVersion = 4;
-
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-
   system.defaults = {
+    stateVersion = 4;
+
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
       AppleEnableSwipeNavigateWithScrolls = false;

@@ -24,18 +24,11 @@
       }
     );
   
-    # darwinConfigurations = (
-    #   import ./machines/macbook {
-    #     inherit (nixpkgs) lib;
-    #     inherit inputs nixpkgs darwin home-manager nur;
-    #   }
-    # );
-
-    # homeConfigurations = (
-    #   import ./home-manager/home.nix {
-    #     inherit (nixpkgs) lib;
-    #     inherit inputs nixpkgs home-manager nur;
-    #   }
-    # );
+    darwinConfigurations = (
+      import ./machines/macbook {
+        inherit (nixpkgs) lib;
+        inherit inputs nixpkgs darwin home-manager;
+      }
+    );
   };
 }
