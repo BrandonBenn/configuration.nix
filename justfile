@@ -15,7 +15,7 @@ alias c := check
 	nix flake check -L
 
 alias co := commit
-@commit:
+commit:
 	#!/bin/sh
 	# Add all changes to staging area
 	git add .
