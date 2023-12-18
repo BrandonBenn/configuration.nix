@@ -3,19 +3,19 @@ set positional-arguments
 command :=  if os() == "linux" { "sudo nixos-rebuild" } else { "darwin-rebuild" }
 
 alias r := rebuild
-rebuild:
+@rebuild:
 	eval "{{command}} switch --flake ."
 
 alias u := update
-update argument:
-	nix flake update $@
+@update *package:
+	nix flake update {{package}}
 
 alias c := check
-check:
+@check:
 	nix flake check -L
 
 alias co := commit
-commit:
+@commit:
 	#!/bin/sh
 	# Add all changes to staging area
 	git add .
