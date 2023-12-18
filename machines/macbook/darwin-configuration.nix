@@ -9,8 +9,6 @@ let
 in
 
 {
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
 
   nix = {
     gc.automatic = true;
@@ -18,22 +16,31 @@ in
     settings.experimental-features = "nix-command flakes";
   };
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs = {
+    system = "aarch64-darwin";
+    config.allowUnfree = true;
+  };
 
   networking.hostName = "macbook";
-  environment.systemPackages = with pkgs; [
-   ngrok
-  ];
 
-  environment.etc.hosts.text = let
-    blockedHosts = builtins.fetchurl "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-    blockedHostsFile = builtins.readFile blockedHosts;
-    hosts = additionalHosts ++ [blockedHostsFile];
-    in builtins.concatStringsSep "\n" hosts;
+  environment = {
+    systemPackages = with pkgs; [
+     ngrok
+    ];
 
-  environment.interactiveShellInit = ''
-    eval $(/opt/homebrew/bin/brew shellenv)
-  '';
+    etc.hosts.text = let
+      blockedHosts = builtins.fetchurl {
+        url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
+        sha256 = "0xcjz4b685f990sw7gvir92i7iy196r0zjp0d3bi9z6ddr0k7rkj";
+      };
+      blockedHostsFile = builtins.readFile blockedHosts;
+      hosts = additionalHosts ++ [blockedHostsFile];
+      in builtins.concatStringsSep "\n" hosts;
+
+    interactiveShellInit = ''
+      eval $(/opt/homebrew/bin/brew shellenv)
+    '';
+  };
   
   programs.zsh = {
     enable = true;
@@ -42,7 +49,7 @@ in
 
   homebrew = {
     enable = true;
-    autoUpdate = true;
+    onActivation.autoUpdate = true;
     brews = [
       "coreutils"
       { name = "libyaml"; link = true; }
@@ -51,122 +58,132 @@ in
       { name = "opensearch"; restart_service = true; }
     ];
     casks = [
+      "dmenu-mac"
+      "firefox"
+      "google-chrome"
+      "iina"
       "logseq"
       "maccy"
-      "firefox"
-      "dmenu-mac"
-      "google-chrome"
+      "nightfall"
+      "shortcat"
     ];
   };
 
-  # Used for backwards compatibility, please read the changelog before changing.
-  # $ darwin-rebuild changelog
-  system.defaults = {
+  system = {
+    # Used for backwards compatibility, please read the changelog before changing.
+    # $ darwin-rebuild changelog
     stateVersion = 4;
 
-    NSGlobalDomain = {
-      AppleInterfaceStyle = "Dark";
-      AppleEnableSwipeNavigateWithScrolls = false;
-      AppleEnableMouseSwipeNavigateWithScrolls = false;
-      # Allow full-OS keyboard control.
-      AppleKeyboardUIMode = 3;
-      _HIHideMenuBar = true;
+    defaults = {
+      NSGlobalDomain = {
+        AppleInterfaceStyle = "Dark";
+        AppleEnableSwipeNavigateWithScrolls = false;
+        AppleEnableMouseSwipeNavigateWithScrolls = false;
+        # Allow full-OS keyboard control.
+        AppleKeyboardUIMode = 3;
+        _HIHideMenuBar = true;
 
-      # Disable press-and-hold for keys in favor of key repeat.
-      ApplePressAndHoldEnabled = false;
+        # Disable press-and-hold for keys in favor of key repeat.
+        ApplePressAndHoldEnabled = false;
 
-      # Always show file extensions in Finder.
-      AppleShowAllExtensions = true;
+        # Always show file extensions in Finder.
+        AppleShowAllExtensions = true;
 
-      # Speed up our key repeat.
-      KeyRepeat = 2;
-      InitialKeyRepeat = 10;
+        # Speed up our key repeat.
+        KeyRepeat = 2;
+        InitialKeyRepeat = 10;
 
-      # In general, have Apple not mess with our text.
-      NSAutomaticCapitalizationEnabled = false;
-      NSAutomaticDashSubstitutionEnabled = false;
-      NSAutomaticPeriodSubstitutionEnabled = false;
-      NSAutomaticQuoteSubstitutionEnabled = null;
-      NSAutomaticSpellingCorrectionEnabled = false;
+        # In general, have Apple not mess with our text.
+        NSAutomaticCapitalizationEnabled = false;
+        NSAutomaticDashSubstitutionEnabled = false;
+        NSAutomaticPeriodSubstitutionEnabled = false;
+        NSAutomaticQuoteSubstitutionEnabled = null;
+        NSAutomaticSpellingCorrectionEnabled = false;
 
-      # Don't automatically terminate inactive apps.
-      # NSDisableAutomaticTermination = false;
+        # Don't automatically terminate inactive apps.
+        # NSDisableAutomaticTermination = false;
 
-      # Always start with Save dialog panels expanded.
-      NSNavPanelExpandedStateForSaveMode = true;
-      NSNavPanelExpandedStateForSaveMode2 = true;
-    };
+        # Always start with Save dialog panels expanded.
+        NSNavPanelExpandedStateForSaveMode = true;
+        NSNavPanelExpandedStateForSaveMode2 = true;
+      };
 
-    # More than just the dock configruation; also controls hot corners.
-    dock = {
-      autohide = true;
-      autohide-delay = 0.0;
-      launchanim = false;
-      mru-spaces = false;
-      # Put the dock on the left side of the screen, where we won't have to see it.
-      orientation = "left";
-      # Disable hot corners.
-      wvous-bl-corner = 1;
-      wvous-br-corner = 1;
-      wvous-tl-corner = 1;
-      wvous-tr-corner = 1;
-    };
+      # More than just the dock configruation; also controls hot corners.
+      dock = {
+        autohide = true;
+        autohide-delay = 0.0;
+        launchanim = false;
+        mru-spaces = false;
+        # Put the dock on the left side of the screen, where we won't have to see it.
+        orientation = "left";
+        # Disable hot corners.
+        wvous-bl-corner = 1;
+        wvous-br-corner = 1;
+        wvous-tl-corner = 1;
+        wvous-tr-corner = 1;
+      };
 
-    finder = {
-      # Necessary for true finder, instead of Finder embeds.
-      AppleShowAllExtensions = true;
-      CreateDesktop = false;
-      # Search in the current folder, instead of the whole mac.
-      FXDefaultSearchScope = "SCcf";
-      # Don't warn us on changing a file extension.
-      FXEnableExtensionChangeWarning = false;
-      # Defeault to the list view in Finder windows.
-      FXPreferredViewStyle = "Nlsv";
-      # Show the pathbar, which gives us breadcrumbs to the current folder.
-      ShowPathbar = true;
-      # Show the status bar, which has some useful metadata.
-      ShowStatusBar = false;
-      # Use the POSIX path in the finder title, rather than just the folder name.
-      _FXShowPosixPathInTitle = true;
-    };
-    loginwindow.GuestEnabled = false;
-  };
-
-  services.yabai = {
-    enable = true;
-    config = {
-      layout              = "float";
-      top_padding         = 0;
-      bottom_padding      = 0;
-      left_padding        = 0;
-      right_padding       = 0;
-      window_gap          = 0;
-      mouse_modifier      = "fn";
+      finder = {
+        # Necessary for true finder, instead of Finder embeds.
+        AppleShowAllExtensions = true;
+        CreateDesktop = false;
+        # Search in the current folder, instead of the whole mac.
+        FXDefaultSearchScope = "SCcf";
+        # Don't warn us on changing a file extension.
+        FXEnableExtensionChangeWarning = false;
+        # Defeault to the list view in Finder windows.
+        FXPreferredViewStyle = "Nlsv";
+        # Show the pathbar, which gives us breadcrumbs to the current folder.
+        ShowPathbar = true;
+        # Show the status bar, which has some useful metadata.
+        ShowStatusBar = false;
+        # Use the POSIX path in the finder title, rather than just the folder name.
+        _FXShowPosixPathInTitle = true;
+      };
+      loginwindow.GuestEnabled = false;
     };
   };
 
-  services.skhd = {
-    enable = true;
-    skhdConfig = ''
-      fn - h : ${pkgs.skhd}/bin/skhd -k "left"
-      fn - j : ${pkgs.skhd}/bin/skhd -k "down"
-      fn - k : ${pkgs.skhd}/bin/skhd -k "up"
-      fn - l : ${pkgs.skhd}/bin/skhd -k "right"
+  services = {
+    # Auto upgrade nix package and the daemon service.
+    nix-daemon.enable = true;
 
-      cmd + alt - f : open /Applications/Alacritty.app
-      cmd + alt - d : open /Applications/Google\ Chrome.app
-      cmd + alt - s : open /Applications/Slack.app
-      cmd + alt - a : export MOZ_DISABLE_SAFE_MODE_KEY=1; open /Applications/Firefox.app
-      cmd - space   : open -n /Applications/dmenu-mac.app
+    yabai = {
+      enable = true;
+      config = {
+        layout              = "float";
+        top_padding         = 0;
+        bottom_padding      = 0;
+        left_padding        = 0;
+        right_padding       = 0;
+        window_gap          = 0;
+        mouse_modifier      = "fn";
+      };
+    };
 
-      # Window Position
-      shift + alt - up    : yabai -m window --grid 1:1:0:0:1:1 # fill
-      shift + alt - left  : yabai -m window --grid 1:2:0:0:1:1 # left
-      shift + alt - right : yabai -m window --grid 1:2:1:0:1:1 # right
-      shift + alt - down  : yabai -m window --grid 4:4:1:1:2:2 # center
+    skhd = {
+      enable = true;
+      skhdConfig = ''
+        fn - h : ${pkgs.skhd}/bin/skhd -k "left"
+        fn - j : ${pkgs.skhd}/bin/skhd -k "down"
+        fn - k : ${pkgs.skhd}/bin/skhd -k "up"
+        fn - l : ${pkgs.skhd}/bin/skhd -k "right"
 
-      # cycle through all visible windows sorted by: coordinates -> display index
-      alt - tab : yabai -m window --focus "$(yabai -m query --windows --space | ${pkgs.jq}/bin/jq -re "[sort_by(.id, .frame) | reverse | .[] | select(.role == \"AXWindow\" and .subrole == \"AXStandardWindow\") | .id] | nth(index($(yabai -m query --windows --window | ${pkgs.jq}/bin/jq -re ".id")) - 1)")"
-      '';
+        cmd + alt - f : open /Applications/Alacritty.app
+        cmd + alt - d : open /Applications/Google\ Chrome.app
+        cmd + alt - s : open /Applications/Slack.app
+        cmd + alt - a : export MOZ_DISABLE_SAFE_MODE_KEY=1; open /Applications/Firefox.app
+        cmd - space   : open -n /Applications/dmenu-mac.app
+
+        # Window Position
+        shift + alt - up    : yabai -m window --grid 1:1:0:0:1:1 # fill
+        shift + alt - left  : yabai -m window --grid 1:2:0:0:1:1 # left
+        shift + alt - right : yabai -m window --grid 1:2:1:0:1:1 # right
+        shift + alt - down  : yabai -m window --grid 4:4:1:1:2:2 # center
+
+        # cycle through all visible windows sorted by: coordinates -> display index
+        alt - tab : yabai -m window --focus "$(yabai -m query --windows --space | ${pkgs.jq}/bin/jq -re "[sort_by(.id, .frame) | reverse | .[] | select(.role == \"AXWindow\" and .subrole == \"AXStandardWindow\") | .id] | nth(index($(yabai -m query --windows --window | ${pkgs.jq}/bin/jq -re ".id")) - 1)")"
+        '';
+    };
   };
 }
