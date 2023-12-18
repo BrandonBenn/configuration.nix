@@ -2,16 +2,14 @@ set positional-arguments
 
 command :=  if os() == "linux" { "sudo nixos-rebuild" } else { "darwin-rebuild" }
 
-alias r := rebuild
-@rebuild:
-	eval "{{command}} switch --flake ."
+rebuild:
+	@eval "{{command}} switch --flake ."
 
 alias u := update
-@update *package:
+update *package:
 	nix flake update {{package}}
 
-alias c := check
-@check:
+check:
 	nix flake check -L
 
 alias co := commit
