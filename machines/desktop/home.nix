@@ -14,18 +14,6 @@
     username = "brandon";
     homeDirectory = "/home/brandon";
     stateVersion = "23.11";
-
-    sessionVariables = {
-      CC  = ''${pkgs.zig}/bin/zig cc'';
-      CXX = ''${pkgs.zig}/bin/zig c++'';
-    };
-    shellAliases = {
-      e = "$EDITOR";
-      g = "git";
-      rm = ''${pkgs.trash-cli}/bin/trash'';
-      T = ''tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$HOSTNAME'';
-      tree = ''${pkgs.eza}/bin/eza --tree'';
-    };
   };
   
   programs = {
