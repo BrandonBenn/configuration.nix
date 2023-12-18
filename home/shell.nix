@@ -1,8 +1,10 @@
+{ config, pkgs, ...}:
 {
   home = {
     shellAliases = {
       e = "$EDITOR";
       g = "git";
+      j = "just";
       rm = ''${pkgs.trash-cli}/bin/trash'';
       T = ''tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$HOSTNAME'';
       tree = ''${pkgs.eza}/bin/eza --tree'';

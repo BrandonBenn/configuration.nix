@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, inputs, nixpkgs, home-manager, nur, hosts, ... }:
+{ config, lib, inputs, nixpkgs, home-manager, ... }:
 let
   system = "x86_64-linux";
   lib = nixpkgs.lib;
@@ -44,8 +44,9 @@ in
   networking = {
     hostName = "desktop";
     networkmanager.enable = true;
+    stevenBlackHosts.enable = true; 
   };
-
+  
   time.timeZone = "Asia/Taipei";
   i18n = {
     # Select internationalisation properties.
@@ -223,6 +224,14 @@ in
     "/usr/share/icons" = mkRoSymBind (config.system.path + "/share/icons");
     "/usr/share/fonts" = mkRoSymBind (aggregatedFonts + "/share/fonts");
    };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.brandon = import ./home.nix;
+    extraSpecialArgs = { inherit inputs nixpkgs; };
+  };
+  
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
