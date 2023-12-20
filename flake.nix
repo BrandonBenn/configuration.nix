@@ -1,7 +1,11 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    hosts.url = "github:StevenBlack/hosts";
+
+    hosts = {
+      url = "github:StevenBlack/hosts";
+      flake = false;
+    };
 
     darwin = {
       url = "github:lnl7/nix-darwin/master";
