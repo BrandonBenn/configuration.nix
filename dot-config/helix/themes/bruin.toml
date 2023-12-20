@@ -13,7 +13,7 @@
 "ui.menu.selected" = { modifiers = ["reversed"] }
 "ui.popup" = { fg = "gray", bg ="none" }
 "ui.selection" = { bg = "light-yellow" }
-"ui.statusline" = { bg = "red", fg = "white", modifiers = ["bold"] }
+"ui.statusline" = { fg = "red", modifiers = ["reversed"] }
 "ui.statusline.inactive" = { fg = "light-gray", modifiers = ["reversed"] }
 "ui.text" = "none"
 "ui.virtual" = "indent"
