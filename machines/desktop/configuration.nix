@@ -12,7 +12,9 @@ let
   };
 in
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+   ./hardware-configuration.nix
+  ];
 
   nix.package = pkgs.nixFlakes;
   nix.gc = {
@@ -44,7 +46,9 @@ in
   networking = {
     hostName = "desktop";
     networkmanager.enable = true;
-    stevenBlackHosts.enable = true; 
+    extraHosts = let
+      blockHosts = builtins.fetchurl (import ../block-hosts.nix);
+    in builtins.readFile "${blockHosts}";
   };
   
   time.timeZone = "Asia/Taipei";
