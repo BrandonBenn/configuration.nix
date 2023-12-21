@@ -16,15 +16,19 @@ in
    ./hardware-configuration.nix
   ];
 
-  nix.package = pkgs.nixFlakes;
-  nix.gc = {
-    dates = "weekly";
-    automatic = true;
-    options = "--delete-older-than 1w";
-  };
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.auto-optimise-store = true;
   nixpkgs.config.allowUnfree = lib.mkForce true;
+  nix = {
+    package = pkgs.nixFlakes;
+    settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+        auto-optimise-store = true;
+    };
+    gc = {
+      dates = "weekly";
+      automatic = true;
+      options = "--delete-older-than 1w";
+    };
+  };
 
   system.autoUpgrade = {
     enable = true;
@@ -83,16 +87,15 @@ in
   hardware.nvidia.modesetting.enable = true;
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-  #  Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
   # Automatic login
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "brandon";
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
+  #  Enable the GNOME Desktop Environment.
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
   services.gnome.core-utilities.enable = false;
   services.gnome.tracker-miners.enable = false;
   services.gnome.tracker.enable = false;
@@ -140,27 +143,20 @@ in
     pulse.enable = true;
   };
 
-  services.flatpak.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.brandon = {
     isNormalUser = true;
     description = "Brandon Duval Benn";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      thunderbird
-      celluloid
-      lazygit
-      lf
-    ];
   };
+  security.sudo.wheelNeedsPassword = false;
   users.defaultUserShell = pkgs.zsh;
 
   environment.variables.EDITOR = "${pkgs.helix}/bin/hx";
 
   programs = {
     git.enable = true;
-    firefox.enable = true;
     starship.enable = true;
 
     zsh.enable = true;
@@ -172,6 +168,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    aria2
     du-dust
     fd
     helix
@@ -188,7 +185,6 @@ in
     gnomeExtensions.appindicator
     gnomeExtensions.clipboard-indicator
     gnomeExtensions.just-perfection
-    gnomeExtensions.run-or-raise
   ];
 
   fonts = {
@@ -210,6 +206,26 @@ in
     };
   };
 
+  # Flatpak
+  services.flatpak.enable = true;
+  services.flatpak.remotes = {
+    "flathub" = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+    "flathub-beta" = "https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo";
+  };
+  services.flatpak.packages = [
+    "flathub:app/org.mozilla.firefox/x86_64/stable"
+    "flathub:app/org.mozilla.Thunderbird/x86_64/stable"
+    "flathub:app/com.bitwarden.desktop/x86_64/stable"
+    "flathub:app/com.github.tchx84.Flatseal/x86_64/stable"
+    "flathub:app/io.github.celluloid_player.Celluloid/x86_64/stable"
+  ];
+  services.flatpak.overrides = {
+    "global" = {
+      environment = {
+        "MOZ_ENABLE_WAYLAND" = 1;
+      };
+    };
+  };
   # Allow flatpak to access system fonts and icons
   system.fsPackages = [ pkgs.bindfs ];
   fileSystems = let
@@ -236,7 +252,6 @@ in
     extraSpecialArgs = { inherit inputs nixpkgs; };
   };
   
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

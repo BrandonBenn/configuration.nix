@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flatpaks.url = "github:GermanBread/declarative-flatpak/stable";
 
     darwin = {
       url = "github:lnl7/nix-darwin/master";
@@ -13,13 +14,13 @@
     };
   };
 
-  outputs = inputs @ { self, nixpkgs, darwin, home-manager, ... }:
+  outputs = inputs @ { self, nixpkgs, darwin, home-manager, flatpaks, ... }:
   {
 
     nixosConfigurations = (
       import ./machines/desktop {
         inherit (nixpkgs) lib;
-        inherit inputs nixpkgs home-manager;
+        inherit inputs nixpkgs home-manager flatpaks;
       }
     );
   

@@ -3,7 +3,6 @@
   imports = [
     ../../home/git.nix
     ../../home/shell.nix
-    ../../home/firefox.nix
   ];
 
   manual.html.enable = true;
