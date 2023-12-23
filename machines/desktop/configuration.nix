@@ -3,6 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, lib, inputs, nixpkgs, home-manager, ... }:
+
 let
   system = "x86_64-linux";
   lib = nixpkgs.lib;
@@ -207,26 +208,21 @@ in
   };
 
   # Flatpak
-  services.flatpak.enable = true;
-  services.flatpak.remotes = {
-    "flathub" = "https://dl.flathub.org/repo/flathub.flatpakrepo";
-    "flathub-beta" = "https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo";
+  services.flatpak = {
+    enable = true;
+    remotes = [
+     { name = "flathub"; location = "https://dl.flathub.org/repo/flathub.flatpakrepo"; } 
+    ];
+    update.auto = { enable = true; onCalendar = "weekly"; };
+    packages = [
+      "org.mozilla.firefox"
+      "org.mozilla.Thunderbird"
+      "com.bitwarden.desktop"
+      "io.mpv.Mpv"
+      "com.github.tchx84.Flatseal" # manage flatpak settings
+    ];
   };
-  services.flatpak.packages = [
-    "flathub:app/org.mozilla.firefox/x86_64/stable"
-    "flathub:app/org.mozilla.Thunderbird/x86_64/stable"
-    "flathub:app/com.bitwarden.desktop/x86_64/stable"
-    "flathub:app/com.github.tchx84.Flatseal/x86_64/stable"
-    "flathub:app/io.github.celluloid_player.Celluloid/x86_64/stable"
-  ];
-  services.flatpak.overrides = {
-    "global" = {
-      environment = {
-        "MOZ_ENABLE_WAYLAND" = 1;
-      };
-    };
-  };
-  # Allow flatpak to access system fonts and icons
+  ## Allow flatpak to access system fonts and icons
   system.fsPackages = [ pkgs.bindfs ];
   fileSystems = let
     mkRoSymBind = path: {
@@ -244,6 +240,15 @@ in
     "/usr/share/icons" = mkRoSymBind (config.system.path + "/share/icons");
     "/usr/share/fonts" = mkRoSymBind (aggregatedFonts + "/share/fonts");
    };
+
+  # Tailscale
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "both";
+    extraUpFlags = [ "--advertise-exit-node" ];
+  };
+  ## IPv6 NAT support
+  networking.nftables.enable = true;
 
   home-manager = {
     useGlobalPkgs = true;

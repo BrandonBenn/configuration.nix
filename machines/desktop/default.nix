@@ -4,7 +4,7 @@
     modules = [
      ./configuration.nix
       home-manager.nixosModules.home-manager
-      flatpaks.nixosModules.default
+      flatpaks.nixosModules.nix-flatpak
     ];
 
     specialArgs = {
