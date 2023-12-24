@@ -22,6 +22,7 @@ in
   };
 
   networking.hostName = "macbook";
+  users.users.brandon.home = "/Users/brandon";
 
   environment = {
     systemPackages = with pkgs; [
@@ -38,11 +39,6 @@ in
     '';
   };
   
-  programs.zsh = {
-    enable = true;
-    enableCompletion = false;
-  };
-
   homebrew = {
     enable = true;
     onActivation.autoUpdate = true;
@@ -62,8 +58,11 @@ in
       "maccy"
       "nightfall"
       "shortcat"
+      "tailscale"
     ];
   };
+
+  services.tailscale.enable = true;
 
   system = {
     # Used for backwards compatibility, please read the changelog before changing.

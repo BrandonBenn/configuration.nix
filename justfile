@@ -3,7 +3,7 @@ set positional-arguments
 command :=  if os() == "linux" { "sudo nixos-rebuild" } else { "darwin-rebuild" }
 
 rebuild:
-	@eval "{{command}} switch --flake ."
+	eval "{{command}} switch --flake ."
 
 alias u := update
 update *package:
