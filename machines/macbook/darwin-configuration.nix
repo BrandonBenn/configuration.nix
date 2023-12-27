@@ -24,6 +24,15 @@ in
   networking.hostName = "macbook";
   users.users.brandon.home = "/Users/brandon";
 
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    enableBashCompletion = true;
+    enableFzfHistory = true;
+    enableFzfGit = true;
+    enableFzfCompletion = true;
+  };
+
   environment = {
     systemPackages = with pkgs; [
      ngrok
@@ -61,8 +70,6 @@ in
       "tailscale"
     ];
   };
-
-  services.tailscale.enable = true;
 
   system = {
     # Used for backwards compatibility, please read the changelog before changing.

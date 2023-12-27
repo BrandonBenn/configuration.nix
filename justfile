@@ -5,7 +5,6 @@ command :=  if os() == "linux" { "sudo nixos-rebuild" } else { "darwin-rebuild" 
 rebuild:
 	eval "{{command}} switch --flake ."
 
-alias u := update
 update *package:
 	nix flake update {{package}}
 
@@ -22,8 +21,10 @@ gc:
 	# garbage collect all unused nix store entries
 	sudo nix store gc --debug
 
-alias co := commit
-commit:
+sync:
+	git fetch --tags && git pull && git push 
+
+auto-commit:
 	#!/bin/sh
 	# Add all changes to staging area
 	git add .
