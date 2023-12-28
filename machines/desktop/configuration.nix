@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, inputs, nixpkgs, home-manager, ... }:
+{ config, lib, inputs, nixpkgs, home-manager, hosts, ... }:
 
 let
   system = "x86_64-linux";
@@ -51,9 +51,7 @@ in
   networking = {
     hostName = "desktop";
     networkmanager.enable = true;
-    extraHosts = let
-      blockHosts = builtins.fetchurl (import ../block-hosts.nix);
-    in builtins.readFile "${blockHosts}";
+    extraHosts = builtins.readFile "${hosts}/hosts";
   };
   
   time.timeZone = "Asia/Taipei";

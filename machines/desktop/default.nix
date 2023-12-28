@@ -1,4 +1,4 @@
-{ lib, inputs, nixpkgs, home-manager, flatpaks, ...}:
+{ lib, inputs, nixpkgs, home-manager, flatpaks, hosts, ...}:
 {
   desktop = nixpkgs.lib.nixosSystem {
     modules = [
@@ -9,7 +9,7 @@
 
     specialArgs = {
       inherit (nixpkgs) lib;
-      inherit inputs nixpkgs home-manager;
+      inherit inputs nixpkgs home-manager hosts;
     };
   };
 }

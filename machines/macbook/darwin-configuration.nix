@@ -1,7 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, hosts, ... }:
 
 let
   additionalHosts = [
+    "127.0.0.1   localhost"
     "127.0.0.1   dev.services.faria.org"
     "127.0.0.1   local-community.faria.org"
     "127.0.0.1   local-certification.faria.org"
@@ -39,9 +40,9 @@ in
     ];
 
     etc.hosts.text = let
-      blockHostFile = builtins.fetchurl (import ../block-hosts.nix);
-      hosts = additionalHosts ++ [blockHostFile];
-      in builtins.concatStringsSep "\n" hosts;
+      blockHosts = builtins.readFile "${hosts}/hosts";
+      allHosts = additionalHosts ++ [blockHosts];
+      in builtins.concatStringsSep "\n" allHosts;
 
     interactiveShellInit = ''
       eval $(/opt/homebrew/bin/brew shellenv)

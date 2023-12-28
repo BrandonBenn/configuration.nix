@@ -1,4 +1,4 @@
-{ lib, inputs, nixpkgs, darwin, home-manager, ...}:
+{ lib, inputs, nixpkgs, darwin, home-manager, hosts, ...}:
 {
   macbook = darwin.lib.darwinSystem {
     modules = [
@@ -13,7 +13,7 @@
 
     specialArgs = {
       inherit (nixpkgs) lib;
-      inherit inputs nixpkgs;
+      inherit inputs nixpkgs hosts;
     };
   };
 }

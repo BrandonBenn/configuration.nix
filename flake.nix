@@ -12,22 +12,27 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    hosts = {
+      url = "github:StevenBlack/hosts";
+      flake = false;
+    };
   };
 
-  outputs = inputs @ { self, nixpkgs, darwin, home-manager, flatpaks, ... }:
+  outputs = inputs @ { self, nixpkgs, darwin, home-manager, flatpaks, hosts, ... }:
   {
 
     nixosConfigurations = (
       import ./machines/desktop {
         inherit (nixpkgs) lib;
-        inherit inputs nixpkgs home-manager flatpaks;
+        inherit inputs nixpkgs home-manager flatpaks hosts;
       }
     );
   
     darwinConfigurations = (
       import ./machines/macbook {
         inherit (nixpkgs) lib;
-        inherit inputs nixpkgs darwin home-manager;
+        inherit inputs nixpkgs darwin home-manager hosts;
       }
     );
   };
