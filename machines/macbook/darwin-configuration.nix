@@ -61,14 +61,13 @@ in
     ];
     casks = [
       "dmenu-mac"
-      "firefox"
+      "librewolf"
       "google-chrome"
       "iina"
       "logseq"
       "maccy"
       "nightfall"
       "shortcat"
-      "tailscale"
     ];
   };
 
@@ -175,7 +174,7 @@ in
         cmd + alt - f : open /Applications/Alacritty.app
         cmd + alt - d : open /Applications/Google\ Chrome.app
         cmd + alt - s : open /Applications/Slack.app
-        cmd + alt - a : export MOZ_DISABLE_SAFE_MODE_KEY=1; open /Applications/Firefox.app
+        cmd + alt - a : export MOZ_DISABLE_SAFE_MODE_KEY=1; open /Applications/LibreWolf.app
         cmd - space   : open -n /Applications/dmenu-mac.app
 
         # Window Position
